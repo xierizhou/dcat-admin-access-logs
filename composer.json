@@ -4,7 +4,7 @@
     "description": "訪問記錄日志扩展~",
     "type": "library",
     "keywords": ["dcat-admin", "extension"],
-    "homepage": "https://github.com/jou/access-log",
+    "homepage": "https://github.com/xierizhou/dcat-admin-access-logs",
     "license": "MIT",
     "authors": [
         {
