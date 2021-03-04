@@ -1,0 +1,32 @@
+{
+    "name": "jou/access-log",
+    "alias": "",
+    "description": "訪問記錄日志扩展~",
+    "type": "library",
+    "keywords": ["dcat-admin", "extension"],
+    "homepage": "https://github.com/jou/access-log",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "xierizhou",
+            "email": "932188443@qq.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.0",
+        "dcat/laravel-admin": "~2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Jou\\AccessLog\\": "src/"
+        }
+    },
+    "extra": {
+        "dcat-admin": "Jou\\AccessLog\\AccessLogServiceProvider",
+        "laravel": {
+            "providers": [
+                "Jou\\AccessLog\\AccessLogServiceProvider"
+            ]
+        }
+    }
+}
