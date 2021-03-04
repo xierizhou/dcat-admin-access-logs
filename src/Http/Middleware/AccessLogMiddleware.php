@@ -27,7 +27,7 @@ class AccessLogMiddleware
             $request->toArray(),
             $request->header() ,
             $response->content()
-        );
+        )->onQueue('access');
         return $response;
     }
 }

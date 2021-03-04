@@ -4,6 +4,8 @@ namespace Jou\AccessLog;
 
 use Dcat\Admin\Extend\ServiceProvider;
 use Dcat\Admin\Admin;
+use Jou\AccessLog\Http\Middleware\AccessLogMiddleware;
+use Jou\AccessLog\Providers\MiddlewareServiceProvider;
 
 class AccessLogServiceProvider extends ServiceProvider
 {
@@ -26,8 +28,11 @@ class AccessLogServiceProvider extends ServiceProvider
 
 	public function register()
 	{
-		//
+
+        $this->app->register(MiddlewareServiceProvider::class);
+
 	}
+
 
 	public function init()
 	{
