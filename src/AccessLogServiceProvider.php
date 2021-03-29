@@ -42,9 +42,9 @@ class AccessLogServiceProvider extends ServiceProvider
 
 	}
 
-	/*public function settingForm()
+	public function settingForm()
 	{
 		return new Setting($this);
-	}*/
+	}
 
 }

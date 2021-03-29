@@ -9,7 +9,7 @@ class Setting extends Form
 
     public function form()
     {
-        $this->text('key1')->required();
-        $this->text('key2')->required();
+        $this->textarea('except','Except')->help('过滤器，多个请用逗号分隔');
+        $this->checkbox('methods')->options([ 'GET'=> 'GET', 'POST' => 'POST', 'PUT' => 'PUT', 'PATCH' => 'PATCH', 'DELETE' => 'DELETE']);
     }
 }

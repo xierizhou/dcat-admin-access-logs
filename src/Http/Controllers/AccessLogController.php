@@ -46,6 +46,7 @@ STYLE
 
     protected function lists(){
         return Grid::make(new AccessLog(), function (Grid $grid) {
+            $grid->model()->orderBy('created_at','desc');
             $grid->column('created_at',"時間");
             $grid->column('ip','IP');
             $grid->column('url','URL');

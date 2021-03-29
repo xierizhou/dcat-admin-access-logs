@@ -5,9 +5,15 @@ namespace Jou\AccessLog\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Jou\AccessLog\Jobs\AccessLog;
+use Jou\AccessLog\AccessLogServiceProvider;
 class AccessLogMiddleware
 {
+    private $request;
+
+    private $response;
+
     /**
      * Handle an incoming request.
      *
@@ -17,7 +23,57 @@ class AccessLogMiddleware
      */
     public function handle($request, Closure $next)
     {
-        $response = $next($request);
+        $this->request = $request;
+        $this->response = $next($this->request);
+        if(!$this->exceptRoute() && $this->allowedMethod()){
+
+            $this->dispatch();
+        }
+        return $this->response;
+    }
+
+    public function exceptRoute(){
+        $except = AccessLogServiceProvider::setting('except');
+
+        $excepts = explode(PHP_EOL,$except);
+        $excepts = array_filter($excepts);
+        $prefix = config('admin.route.prefix');
+        array_unshift($excepts,$prefix);
+        array_unshift($excepts,$prefix.'/*');
+
+        $is_except = false;
+        foreach($excepts as $except){
+            $except = trim($except);
+            if ($except !== '/') {
+                $except = trim($except, '/');
+            }
+
+            if ($this->request->fullUrlIs($except) || $this->request->is($except)) {
+                $is_except = true;
+                break;
+            }
+
+        }
+
+        return $is_except;
+
+    }
+
+    public function allowedMethod(){
+        $methods = AccessLogServiceProvider::setting('methods');
+
+        if(in_array($this->request->method(),$methods)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public function dispatch(){
+        $request = $this->request;
+
+        $response = $this->response;
+
         AccessLog::dispatch(
             $request->path(),
             $request->method(),
@@ -28,6 +84,5 @@ class AccessLogMiddleware
             $request->header() ,
             $response->content()
         )->onQueue('access');
-        return $response;
     }
 }
