@@ -63,7 +63,7 @@ class AccessLog implements ShouldQueue
             'crawler'=>DeviceTypeHandlers::getCrawler($this->user_agent),
             'parameter'=>$this->parameter,
             'headers'=>$this->header,
-            'response'=>$this->response
+            //'response'=>$this->response
         ];
 
         try{
