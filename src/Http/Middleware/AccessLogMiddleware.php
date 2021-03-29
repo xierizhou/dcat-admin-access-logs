@@ -62,7 +62,7 @@ class AccessLogMiddleware
     public function allowedMethod(){
         $methods = AccessLogServiceProvider::setting('methods');
 
-        if(in_array($this->request->method(),$methods)){
+        if($methods && in_array($this->request->method(),$methods)){
             return true;
         }else{
             return false;
