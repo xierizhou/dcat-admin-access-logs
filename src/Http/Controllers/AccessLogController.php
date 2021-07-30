@@ -21,7 +21,7 @@ class AccessLogController extends Controller
        if(!$request->created_at){
             $start_time=Carbon::now()->startOfDay();
             $end_time=Carbon::now()->endOfDay();
-            $url = admin_url('access-logs').'?created_at[start]='.$start_time.'&created_at[end]='.$end_time;
+            $url = admin_url('access-log').'?created_at[start]='.$start_time.'&created_at[end]='.$end_time;
             return redirect()->to($url);
         }
         ini_set('memory_limit', '256m');
