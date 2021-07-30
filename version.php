@@ -27,5 +27,9 @@ return [
         '增加查询索引,优化查询',
         '默认查询当天',
         'change_created_at_key_into_jou_access_logs.php'
+    ],
+    '1.2.1' => [
+        '增加IP查询索引，优化查询',
+        'change_ip_key_into_jou_access_logs.php'
     ]
 ];
