@@ -23,4 +23,9 @@ return [
         '可在扩展中心设置过滤无须记录的路径',
         '修复访问记录排序问题'
     ],
+    '1.2.0' => [
+        '增加查询索引,优化查询',
+        '默认查询当天',
+        'change_created_at_key_into_jou_access_logs.php'
+    ]
 ];

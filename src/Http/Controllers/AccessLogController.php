@@ -2,6 +2,7 @@
 
 namespace Jou\AccessLog\Http\Controllers;
 
+use Carbon\Carbon;
 use Jou\AccessLog\Metrics\Access\MonthAccess;
 use Jou\AccessLog\Metrics\Access\PageAccess;
 use Jou\AccessLog\Models\AccessLog;
@@ -16,6 +17,13 @@ class AccessLogController extends Controller
 {
     public function index(Content $content)
     {
+        $request = request();
+       if(!$request->created_at){
+            $start_time=Carbon::now()->startOfDay();
+            $end_time=Carbon::now()->endOfDay();
+            $url = admin_url('access-logs').'?created_at[start]='.$start_time.'&created_at[end]='.$end_time;
+            return redirect()->to($url);
+        }
         ini_set('memory_limit', '256m');
 
         Admin::style(
@@ -57,9 +65,9 @@ STYLE
             $grid->disableFilterButton();
             $grid->disableToolbar();
             $grid->filter(function (Grid\Filter $filter) {
+                $filter->between('created_at', "訪問時間")->datetime()->width(4);
                 $filter->equal('ip')->width(3);
                 $filter->equal('url')->width(3);
-                $filter->between('created_at', "訪問時間")->datetime()->width(4);
                 $filter->equal('method','請求方式')->select(['GET'=>'GET','POST'=>'POST'])->width(2);
                 $filter->equal('host','域名')->width(3);
                 $filter->in('device','設備')->width(4)->multipleSelect(['iphone' => 'iphone','android' => 'android','ipad' => 'ipad','windows' => 'windows','mac' => 'MAC','linux'=>'linux','unknown'=>'unknown']);
