@@ -26,7 +26,7 @@ class ChangeIpKeyIntoJouAccessLogs extends Migration
     public function down()
     {
         Schema::table('jou_access_logs', function (Blueprint $table) {
-            $table->dropIndex('ip');
+            $table->dropIndex('jou_access_logs_ip_index');
         });
     }
 }
