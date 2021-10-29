@@ -53,10 +53,11 @@ STYLE
     }
 
     protected function lists(){
+
         return Grid::make(new AccessLog(), function (Grid $grid) {
             $grid->model()->orderBy('created_at','desc');
             $grid->column('created_at',"時間");
-            $grid->column('ip','IP');
+            $grid->column('ip','IP')->filter('ip');
             $grid->column('url','URL');
             $grid->column('method','請求方式');
             $grid->column('referer','來源');
@@ -85,6 +86,9 @@ STYLE
     protected function rightStatistics(){
         $request = request();
         $access_log = new AccessLog();
+        if($request->get('filter-ip')){
+            $request->merge(['ip'=>$request->get('filter-ip')]);
+        }
         if($request->get('ip')){
             $access_log = $access_log->where('ip',$request->get('ip'));
         }
