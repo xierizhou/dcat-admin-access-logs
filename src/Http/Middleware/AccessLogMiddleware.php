@@ -34,13 +34,18 @@ class AccessLogMiddleware
 
     public function exceptRoute(){
         $except = AccessLogServiceProvider::setting('except');
-
+        $admin_domain = config('admin.route.domain');
         $excepts = explode(PHP_EOL,$except);
         $excepts = array_filter($excepts);
-        $prefix = config('admin.route.prefix');
-        array_unshift($excepts,$prefix);
-        array_unshift($excepts,$prefix.'/*');
-
+        if($admin_domain != $this->request->getHost()){
+            if(!$admin_domain){
+                $prefix = config('admin.route.prefix');
+                array_unshift($excepts,$prefix);
+                array_unshift($excepts,$prefix.'/*');
+            }
+        }else{
+            return true;
+        }
         $is_except = false;
         foreach($excepts as $except){
             $except = trim($except);
@@ -78,11 +83,12 @@ class AccessLogMiddleware
             $request->path(),
             $request->method(),
             $request->getHost(),
-            Arr::get($_SERVER,'HTTP_REFERER'),$request->header('cf-connecting-ip',$request->ip()),
+            Arr::get($_SERVER,'HTTP_REFERER'),
+            $request->header('cf-connecting-ip',$request->ip()),
             $request->userAgent() ,
             $request->toArray(),
             $request->header() ,
             $response->content()
-        )->onQueue('access');
+        );
     }
 }

@@ -56,7 +56,7 @@ class AccessLog implements ShouldQueue
             'url'=>$this->getUrlPath($this->path),
             'method'=>$this->method,
             'host'=>$this->host,
-            'referer'=>Arr::get($_SERVER,'HTTP_REFERER'),
+            'referer'=>$this->referer,
             'ip'=>$this->ip,
             'user_agent'=>$this->user_agent,
             'device'=>DeviceTypeHandlers::getDevice($this->user_agent),
