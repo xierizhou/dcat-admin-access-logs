@@ -87,8 +87,8 @@ class AccessLogMiddleware
             $request->header('cf-connecting-ip',$request->ip()),
             $request->userAgent() ,
             $request->toArray(),
-            $request->header() ,
-            $response->content()
+            $request->header()
+            //$response->content()
         );
     }
 }
