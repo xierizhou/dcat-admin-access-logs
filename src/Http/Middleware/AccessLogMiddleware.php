@@ -78,8 +78,20 @@ class AccessLogMiddleware
         $request = $this->request;
 
         $response = $this->response;
+        $AccessLog = new \Jou\AccessLog\Support\AccessLog(
+            $request->path(),
+            $request->method(),
+            $request->getHost(),
+            Arr::get($_SERVER,'HTTP_REFERER'),
+            $request->header('cf-connecting-ip',$request->ip()),
+            $request->userAgent() ,
+            $request->toArray(),
+            $request->header()
 
-        AccessLog::dispatch(
+        );
+        $AccessLog->handle();
+
+        /*AccessLog::dispatch(
             $request->path(),
             $request->method(),
             $request->getHost(),
@@ -89,6 +101,6 @@ class AccessLogMiddleware
             $request->toArray(),
             $request->header()
             //$response->content()
-        );
+        );*/
     }
 }
