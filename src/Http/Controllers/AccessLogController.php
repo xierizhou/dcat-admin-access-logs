@@ -71,7 +71,8 @@ STYLE
                 $filter->equal('url')->width(3);
                 $filter->equal('method','請求方式')->select(['GET'=>'GET','POST'=>'POST'])->width(2);
                 $filter->equal('host','域名')->width(3);
-                $filter->in('device','設備')->width(4)->multipleSelect(['iphone' => 'iphone','android' => 'android','ipad' => 'ipad','windows' => 'windows','mac' => 'MAC','linux'=>'linux','unknown'=>'unknown']);
+                $filter->in('device','設備')->width(3)->multipleSelect(['iphone' => 'iphone','android' => 'android','ipad' => 'ipad','windows' => 'windows','mac' => 'MAC','linux'=>'linux','unknown'=>'unknown']);
+                $filter->like('user_agent','载具')->width(3);
                 $filter->panel();
                 $filter->expand();
             });
