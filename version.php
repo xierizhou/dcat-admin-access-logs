@@ -31,5 +31,8 @@ return [
     '1.2.1' => [
         '增加IP查询索引，优化查询',
         'change_ip_key_into_jou_access_logs.php'
+    ],
+    '1.2.2' => [
+        '二级域名记录失效问题修复'
     ]
 ];
