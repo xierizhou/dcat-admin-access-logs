@@ -17,6 +17,7 @@ class AccessLogController extends Controller
 {
     public function index(Content $content)
     {
+       set_time_limit(0);
         $request = request();
        if(!$request->created_at){
             $start_time=Carbon::now()->startOfDay();
