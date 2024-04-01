@@ -25,7 +25,7 @@ class AccessLogController extends Controller
             $url = admin_url('access-log').'?created_at[start]='.$start_time.'&created_at[end]='.$end_time;
             return redirect()->to($url);
         }
-        ini_set('memory_limit', '256m');
+        ini_set('memory_limit', '512m');
 
         Admin::style(
             <<<STYLE
