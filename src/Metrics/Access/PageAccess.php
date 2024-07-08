@@ -20,7 +20,7 @@ class PageAccess extends Bar
     {
         parent::init();
 
-        $this->title('页面最多訪問(前10個)'."<a class='develop' data-cookie-key='develop_2' href='javascript:;'> 展開/收起</a>");
+        $this->title('页面最多訪問(前10個)');
         $this->dropdown([
             '7' => '最近7天',
             '15' => '最近15天',
