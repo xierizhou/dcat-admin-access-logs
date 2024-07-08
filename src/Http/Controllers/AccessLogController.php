@@ -3,8 +3,12 @@
 namespace Jou\AccessLog\Http\Controllers;
 
 use Carbon\Carbon;
+use Dcat\Admin\Widgets\Modal;
+use Jou\AccessLog\AccessLogServiceProvider;
 use Jou\AccessLog\Metrics\Access\MonthAccess;
+use Jou\AccessLog\Metrics\Access\OrderConversion;
 use Jou\AccessLog\Metrics\Access\PageAccess;
+use Jou\AccessLog\Metrics\Access\PageBounce;
 use Jou\AccessLog\Models\AccessLog;
 use Dcat\Admin\Grid;
 use Dcat\Admin\Layout\Content;
@@ -40,14 +44,26 @@ STYLE
         Admin::js(['@jou.access-log/js/access.js']);*/
 
         Admin::requireAssets('@jou.access-log');
-
+        $chart = Modal::make()
+            ->lg()
+            ->title('异步加载 - 图表')
+            ->body("123123")
+            ->button('<button class="btn btn-white"><i class="feather icon-bar-chart-2"></i> 异步加载</button>');
         $content->row(function(Row $row){
-            $row->column(12,new MonthAccess());
-            $row->column(12,new PageAccess());
+            $row->column(6,new MonthAccess());
+            $row->column(6,new PageAccess());
         });
+        $content->row(function(Row $row) use ($chart){
+            $row->column(4,new PageBounce());
+            $row->column(4,new OrderConversion());
+            $order_model = AccessLogServiceProvider::setting('order_model');
+            if($order_model){
+                $row->column(4,$this->rightStatistics());
+            }
 
+        });
         $content->row(function(Row $row){
-            $row->column(12,$this->rightStatistics());
+            //$row->column(12,$this->rightStatistics());
             $row->column(12,$this->lists());
         });
         return $content;
@@ -149,9 +165,65 @@ STYLE
 
 
         return <<<HTML
-<div style="float:right">
-    IP數量:$total_ip_count 訪問數:$total_count  |  PC IP數:$pc_ip_count 訪問數:$pc_count  |  m版 IP數:$m_ip_count  訪問數:$m_count
+<style>
+.statices{
+
+}
+.statices .flex{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.statices-block{
+    margin-bottom: 10px;
+    width: 49%;
+    background-color: #fff;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .05);
+
+    border-radius: .25rem;
+    color: #333;
+    text-align: left;
+    padding: .5rem 1.1rem;
+}
+.statices-block .lab{
+    font-size: 12px;
+    color: #333;
+    display: block;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    
+}
+.statices-block .text{
+    display: block;
+    font-size: 12px;
+}
+</style>
+<div class="statices">
+    <div class="statices-block" style="width: 100%;padding: .7rem;font-size: 14px">
+        <span style="margin-right: 10px">总访问量：$total_count</span> <span>独立访问量：$total_ip_count</span>
+    </div>
+    <div class="flex">
+        <div class="statices-block" >
+            <span class="lab">桌面版（PC）</span>
+            <span class="text">总量：$pc_count ｜ IP：$pc_ip_count </span>
+            <span class="text">Mac：$pc_count ｜ IP：$pc_ip_count </span>
+            <span class="text">Win：$pc_count ｜ IP：$pc_ip_count </span>
+            <span class="text">其它：$pc_count ｜ IP：$pc_ip_count </span>
+        </div>
+        <div class="statices-block">
+            <span class="lab">移动版（Mobile & ipad）</span>
+            <span class="text">总量：$pc_count ｜ IP：$pc_ip_count </span>
+            <span class="text">iPhone：$pc_count ｜ IP：$pc_ip_count </span>
+            <span class="text">Android：$pc_count ｜ IP：$pc_ip_count </span>
+            <span class="text">其它：$pc_count ｜ IP：$pc_ip_count </span>
+        </div>
+    </div>
 </div>
+
+
 HTML;
     }
 }

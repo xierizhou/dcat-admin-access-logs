@@ -4,6 +4,7 @@
 namespace Jou\AccessLog\Metrics\Access;
 
 
+use Jou\AccessLog\Metrics\DateRangeHelper;
 use Jou\AccessLog\Metrics\Line;
 use Carbon\Carbon;
 use Jou\AccessLog\Models\AccessLog;
@@ -23,7 +24,7 @@ class MonthAccess extends Line
         parent::init();
 
 
-        $this->title('訪問統計表'."<a class='develop' data-cookie-key='develop_1' href='javascript:;'> 展開/收起</a>");
+        $this->title('訪問統計表');
 
 
         $this->withDropdown();
@@ -32,11 +33,12 @@ class MonthAccess extends Line
     }
 
     public function withDropdown(){
-        $dropdown[0] = "今日";
-        $dropdown[-1] = "本月";
-        for ($i=1;$i<=12;$i++){
-            $dropdown[$i] = $i."月";
-        }
+        $dropdown['today'] = '今日';
+        $dropdown['yesterday'] = '昨日';
+        $dropdown['week'] = '本周';
+        $dropdown['last_week'] = '上周';
+        $dropdown['month'] = '本月';
+        $dropdown['last_month'] = '上月';
 
         $this->dropdown($dropdown);
     }
@@ -51,23 +53,24 @@ class MonthAccess extends Line
     public function handle(Request $request)
     {
 
-        $option = $request->get('option');
-        if(!$option){
-            $this->withDayCategories();
 
-            $start = Carbon::now()->startOfDay();
-            $end = Carbon::now()->endOfDay();
+        $range = $request->get('option','today');
+
+        $dateRange = DateRangeHelper::getDateRange($range);
+        $start = $dateRange['start'];
+        $end = $dateRange['end'];
+        if($range == 'today' || $range == 'yesterday'){
+            $this->withDayCategories();
             $format = 'H';
         }else{
-            $option = $option>=1?$option:date('m');
-            $this->withCategories($option);
-            $start = Carbon::parse()->month($option)->startOfMonth();
-            $end = Carbon::parse()->month($option)->endOfMonth();
+            $m = date('m',strtotime($start));
+            $this->withCategories($m);
             $format = 'd';
         }
 
 
         $access_logs = AccessLog::whereBetween('created_at',[$start,$end])->get();
+
 
         list($counts,$ip_counts) = $this->getDaysGroupCount($access_logs,$format);
 
@@ -77,7 +80,7 @@ class MonthAccess extends Line
         $chart_data_ip = array_values($ip_counts);
 
 
-        $this->withContent(array_sum($chart_data),array_sum($chart_data_ip));
+        $this->withContent(array_sum($chart_data),$access_logs->groupBy('ip')->count());
 
         $this->withChart($chart_data,$chart_data_ip);
 
@@ -102,7 +105,9 @@ class MonthAccess extends Line
         }
 
 
+
         $ip_count = $this->chartData;
+
         foreach($temp_ip_data as $key=>$item){
             $nk = (int)$key;
             $ip_count[$nk] = count($item);
@@ -149,8 +154,11 @@ class MonthAccess extends Line
             $this->chartData[$i+1] = 0;
         }
 
+
         $this->chart->option('xaxis.categories',$categories);
     }
+
+
 
     /**
      * 按時分类
