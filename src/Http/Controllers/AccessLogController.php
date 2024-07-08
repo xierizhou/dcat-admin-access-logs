@@ -137,13 +137,21 @@ STYLE
             $access_log = $access_log->whereIn('device',$request->get('device'));
         }
 
-        $access = $access_log->get();
+        $access = $access_log->select('id','url','method','host','ip','referer','user_agent','device')->get();
 
         $total_count = count($access);
         $total_ip_count = [];
 
         $mobile_data = [];
         $pc_data = [];
+        $device_count = [
+            'windows'=>[],
+            'mac'=>[],
+            'iphone'=>[],
+            'android'=>[],
+            'ipad'=>[],
+            'unknown'=>[],
+        ];
         foreach($access as $item){
             $total_ip_count[$item->ip] = 1;
 
@@ -152,8 +160,26 @@ STYLE
             }else{
                 $pc_data[] = $item;
             }
+            $agent = strtolower($item->user_agent);
+
+            $device_type = 'unknown';
+
+
+            $device_type = (strpos($agent, 'windows')) ? 'windows' : $device_type;
+
+            $device_type = (strpos($agent, 'mac')) ? 'mac' : $device_type;
+
+            $device_type = (strpos($agent, 'iphone')) ? 'iphone' : $device_type;
+
+            $device_type = (strpos($agent, 'ipad')) ? 'ipad' : $device_type;
+
+            $device_type = (strpos($agent, 'android')) ? 'android' : $device_type;
+
+
+            $device_count[$device_type][] = $item->ip;
 
         }
+
 
         $total_ip_count = count($total_ip_count);
 
@@ -163,8 +189,23 @@ STYLE
         $pc_count = count($pc_data);
         $pc_ip_count = count(array_unique(array_column($pc_data,'ip')));
 
+        $mac_count = count($device_count['mac']);
+        $mac_count_ip = count(array_unique($device_count['mac']));
 
+        $win_count = count($device_count['windows']);
+        $win_count_ip = count(array_unique($device_count['windows']));
 
+        $iphone_count = count($device_count['iphone']);
+        $iphone_count_ip = count(array_unique($device_count['iphone']));
+
+        $android_count = count($device_count['android']);
+        $android_count_ip = count(array_unique($device_count['android']));
+
+        $ipad_count = count($device_count['ipad']);
+        $ipad_count_ip = count(array_unique($device_count['ipad']));
+
+        $unknown_count = count($device_count['unknown']);
+        $unknown_count_ip = count(array_unique($device_count['unknown']));
         return <<<HTML
 <style>
 .statices{
@@ -210,16 +251,16 @@ STYLE
         <div class="statices-block" >
             <span class="lab">桌面版（PC）</span>
             <span class="text">总量：$pc_count ｜ IP：$pc_ip_count </span>
-            <span class="text">Mac：$pc_count ｜ IP：$pc_ip_count </span>
-            <span class="text">Win：$pc_count ｜ IP：$pc_ip_count </span>
-            <span class="text">其它：$pc_count ｜ IP：$pc_ip_count </span>
+            <span class="text">Mac：$mac_count ｜ IP：$mac_count_ip </span>
+            <span class="text">Win：$win_count ｜ IP：$win_count_ip </span>
+            <span class="text">其它：$unknown_count ｜ IP：$unknown_count_ip </span>
         </div>
         <div class="statices-block">
             <span class="lab">移动版（Mobile & ipad）</span>
-            <span class="text">总量：$pc_count ｜ IP：$pc_ip_count </span>
-            <span class="text">iPhone：$pc_count ｜ IP：$pc_ip_count </span>
-            <span class="text">Android：$pc_count ｜ IP：$pc_ip_count </span>
-            <span class="text">其它：$pc_count ｜ IP：$pc_ip_count </span>
+            <span class="text">总量：$m_count ｜ IP：$m_ip_count </span>
+            <span class="text">iPhone：$iphone_count ｜ IP：$iphone_count_ip </span>
+            <span class="text">Android：$android_count ｜ IP：$android_count_ip </span>
+            <span class="text">iPad：$ipad_count ｜ IP：$ipad_count_ip </span>
         </div>
     </div>
 </div>

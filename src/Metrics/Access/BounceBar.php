@@ -52,6 +52,7 @@ class BounceBar extends Bar
 
         $uniqueIpLogs = AccessLog::select('ip', 'method','url', 'created_at')
             ->where('method', 'GET')
+            ->where('crawler',null)
             ->whereBetween('created_at', [$start, $end])
             ->get();
 

@@ -54,6 +54,7 @@ class OrderConversionBar extends Bar
 
         $logs = AccessLog::select('ip', 'method','url', 'created_at')
             ->where('method', 'GET')
+            ->where('crawler',null)
             ->whereBetween('created_at', [$start, $end])
             ->orderBy('created_at','desc')
             ->get();

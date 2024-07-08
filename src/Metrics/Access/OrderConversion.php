@@ -65,7 +65,7 @@ class OrderConversion extends Card
         $range = $request->get('option',date('n'));
         $dateRange = DateRangeHelper::getDateRange($range);
 
-        $access_log = $access_log->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->select('ip')->groupBy('ip')->get();
+        $access_log = $access_log->where('crawler',null)->where('method', 'GET')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->select('ip')->groupBy('ip')->get();
 
         $access_count = $access_log->count();
 

@@ -69,7 +69,7 @@ class PageBounce extends Card
         $dateRange = DateRangeHelper::getDateRange($range);
 
 
-        $access_log = $access_log->where('method','GET')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->select('ip','url')->get();
+        $access_log = $access_log->where('method','GET')->where('crawler',null)->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->select('ip','url','crawler')->get();
 
 
         // 初始化跳出会话和总会话数量的数组
