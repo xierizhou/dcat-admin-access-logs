@@ -155,11 +155,7 @@ STYLE
         foreach($access as $item){
             $total_ip_count[$item->ip] = 1;
 
-            if(in_array($item->device,['iphone','android'])){
-                $mobile_data[] = $item;
-            }else{
-                $pc_data[] = $item;
-            }
+
             $agent = strtolower($item->user_agent);
 
             $device_type = 'unknown';
@@ -178,7 +174,14 @@ STYLE
 
             $device_count[$device_type][] = $item->ip;
 
+            if(in_array($device_type,['iphone','android','ipad'])){
+                $mobile_data[] = $item;
+            }else{
+                $pc_data[] = $item;
+            }
+
         }
+
 
 
         $total_ip_count = count($total_ip_count);
