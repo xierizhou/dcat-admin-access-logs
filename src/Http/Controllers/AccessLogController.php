@@ -55,11 +55,12 @@ STYLE
         });
         $content->row(function(Row $row) use ($chart){
             $row->column(4,new PageBounce());
-            $row->column(4,new OrderConversion());
+
             $order_model = AccessLogServiceProvider::setting('order_model');
             if($order_model){
-                $row->column(4,$this->rightStatistics());
+                $row->column(4,new OrderConversion());
             }
+            $row->column(4,$this->rightStatistics());
 
         });
         $content->row(function(Row $row){
