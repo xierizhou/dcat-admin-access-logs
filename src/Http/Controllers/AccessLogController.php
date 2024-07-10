@@ -7,6 +7,7 @@ use Dcat\Admin\Widgets\Modal;
 use Jou\AccessLog\AccessLogServiceProvider;
 use Jou\AccessLog\Metrics\Access\MonthAccess;
 use Jou\AccessLog\Metrics\Access\OrderConversion;
+use Jou\AccessLog\Metrics\Access\OrderRepeat;
 use Jou\AccessLog\Metrics\Access\PageAccess;
 use Jou\AccessLog\Metrics\Access\PageBounce;
 use Jou\AccessLog\Models\AccessLog;
@@ -54,13 +55,18 @@ STYLE
             $row->column(6,new PageAccess());
         });
         $content->row(function(Row $row) use ($chart){
-            $row->column(4,new PageBounce());
+            $row->column(3,new PageBounce());
 
             $order_model = AccessLogServiceProvider::setting('order_model');
             if($order_model){
-                $row->column(4,new OrderConversion());
+                $row->column(3,new OrderConversion());
             }
-            $row->column(4,$this->rightStatistics());
+
+            $row->column(3,new OrderRepeat());
+
+            $row->column(3,$this->rightStatistics());
+
+
 
         });
         $content->row(function(Row $row){
@@ -222,7 +228,7 @@ STYLE
 }
 .statices-block{
     margin-bottom: 10px;
-    width: 49%;
+    width: 48%;
     background-color: #fff;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .05);
 
