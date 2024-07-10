@@ -74,13 +74,10 @@ class OrderConversion extends Card
 
         if($order_count && $order_count){
             $rate = ($order_count/$access_count)*100;
-
-            $this->withContent(round($rate).'<span class="font-md-2"> %</span>');
+            $this->withContent(round($rate,2).'<span class="font-md-2"> %</span>');
         }else{
             $this->withContent('0'.'<span class="font-md-2"> %</span>');
         }
-
-
     }
 
 
