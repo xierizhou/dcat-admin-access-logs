@@ -101,7 +101,7 @@ class PageBounce extends Card
         }
 
         $rate = ($out/$count)*100;
-        $this->withContent(round($rate).'<span class="font-md-2"> %</span>');
+        $this->withContent(round($rate,2).'<span class="font-md-2"> %</span>');
 
 
 
