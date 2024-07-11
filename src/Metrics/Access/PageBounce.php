@@ -127,7 +127,7 @@ class PageBounce extends Card
 
 </div>
 <div class="ml-1 mt-1 text-80 font-sm-2">
-    例如有1000IP访问了网站，其中50个没有二次浏览行为，50/1000=5%
+    例如有100IP访问网站，有50个没有二次浏览，50/1000=5%
 </div>
 HTML
         );
