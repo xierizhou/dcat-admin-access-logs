@@ -3,6 +3,7 @@
 namespace Jou\AccessLog\Metrics;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Redis;
 
 class DateRangeHelper
 {
@@ -17,6 +18,17 @@ class DateRangeHelper
 
 
         switch ($range) {
+            case 'customize':
+                $time = Redis::get('access_request_time');
+                if($time){
+                    $time2 = json_decode($time,true);
+                    $start = Carbon::parse($time2['start']);
+                    $end = Carbon::parse($time2['end']);
+                }else{
+                    $start = $now->copy()->startOfDay();
+                    $end = $now->copy()->endOfDay();
+                }
+                break;
             case 'yesterday':
                 $start = $now->copy()->subDay()->startOfDay();
                 $end = $now->copy()->subDay()->endOfDay();

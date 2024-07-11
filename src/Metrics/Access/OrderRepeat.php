@@ -31,6 +31,7 @@ class OrderRepeat extends Card
 
         //$dropdown['today'] = '今日';
         //$dropdown['yesterday'] = '昨日';
+        $dropdown['customize'] = '自定义';
         $dropdown['week'] = '本周';
         $dropdown['last_week'] = '上周';
         $dropdown['month'] = '本月';
@@ -55,7 +56,7 @@ class OrderRepeat extends Card
 
         $access_log = new AccessLog();
 
-        $range = $request->get('option','week');
+        $range = $request->get('option','customize');
 
         $dateRange = DateRangeHelper::getDateRange($range);
 

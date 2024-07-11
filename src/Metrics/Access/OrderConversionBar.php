@@ -23,7 +23,7 @@ class OrderConversionBar extends Bar
         parent::init();
 
         $this->title('订单流失页面报表（前10个）<br>');
-
+        $dropdown['customize'] = '自定义';
         $dropdown['today'] = '今日';
         $dropdown['yesterday'] = '昨日';
         $dropdown['week'] = '本周';
@@ -47,7 +47,7 @@ class OrderConversionBar extends Bar
     public function handle(Request $request)
     {
 
-        $range = $request->get('option',date('n'));
+        $range = $request->get('option','customize');
         $dateRange = DateRangeHelper::getDateRange($range);
         $start = $dateRange['start'];
         $end = $dateRange['end'];
@@ -55,6 +55,7 @@ class OrderConversionBar extends Bar
         $logs = AccessLog::select('ip', 'method','url', 'created_at')
             ->where('method', 'GET')
             ->where('crawler',null)
+            ->where('device','<>','unknown')
             ->whereBetween('created_at', [$start, $end])
             ->orderBy('created_at','desc')
             ->get();

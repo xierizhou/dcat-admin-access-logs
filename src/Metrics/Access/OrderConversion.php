@@ -28,7 +28,7 @@ class OrderConversion extends Card
 
         $this->title('订单转化率');
 
-
+        $dropdown['customize'] = '自定义';
         $dropdown['today'] = '今日';
         $dropdown['yesterday'] = '昨日';
         $dropdown['week'] = '本周';
@@ -62,10 +62,11 @@ class OrderConversion extends Card
 
         $access_log = new AccessLog();
 
-        $range = $request->get('option','today');
+        $range = $request->get('option','customize');
+
         $dateRange = DateRangeHelper::getDateRange($range);
 
-        $access_log = $access_log->where('crawler',null)->where('method', 'GET')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->select('ip')->groupBy('ip')->get();
+        $access_log = $access_log->where('crawler',null)->where('device','<>','unknown')->where('method', 'GET')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->select('ip')->groupBy('ip')->get();
 
         $access_count = $access_log->count();
 

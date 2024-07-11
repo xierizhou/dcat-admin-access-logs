@@ -3,7 +3,8 @@
 namespace Jou\AccessLog\Http\Controllers;
 
 use Carbon\Carbon;
-use Dcat\Admin\Widgets\Modal;
+
+use Illuminate\Support\Facades\Redis;
 use Jou\AccessLog\AccessLogServiceProvider;
 use Jou\AccessLog\Metrics\Access\MonthAccess;
 use Jou\AccessLog\Metrics\Access\OrderConversion;
@@ -30,6 +31,10 @@ class AccessLogController extends Controller
             $url = admin_url('access-log').'?created_at[start]='.$start_time.'&created_at[end]='.$end_time;
             return redirect()->to($url);
         }
+
+        Redis::set('access_request_time',json_encode($request->created_at));
+
+
         ini_set('memory_limit', '512m');
 
         Admin::style(
@@ -37,6 +42,13 @@ class AccessLogController extends Controller
 .develop{
     font-size: .9rem;
 }
+.custom-data-table-header{
+    position: absolute;
+    right: 20px;
+    top:120px;
+    z-index: 10;
+}
+
 STYLE
         );
         /*Admin::js(asset('static/js/jquery.cookie.js'));
@@ -45,24 +57,22 @@ STYLE
         Admin::js(['@jou.access-log/js/access.js']);*/
 
         Admin::requireAssets('@jou.access-log');
-        $chart = Modal::make()
-            ->lg()
-            ->title('异步加载 - 图表')
-            ->body("123123")
-            ->button('<button class="btn btn-white"><i class="feather icon-bar-chart-2"></i> 异步加载</button>');
+
         $content->row(function(Row $row){
             $row->column(6,new MonthAccess());
             $row->column(6,new PageAccess());
         });
-        $content->row(function(Row $row) use ($chart){
+        $content->row(function(Row $row){
             $row->column(3,new PageBounce());
 
             $order_model = AccessLogServiceProvider::setting('order_model');
             if($order_model){
                 $row->column(3,new OrderConversion());
+
+                $row->column(3,new OrderRepeat());
             }
 
-            $row->column(3,new OrderRepeat());
+
 
             $row->column(3,$this->rightStatistics());
 
@@ -88,9 +98,10 @@ STYLE
             $grid->column('user_agent','載具')->width("300px");
             $grid->column('host','域名');
             $grid->disableFilterButton();
-            $grid->disableToolbar();
+            $grid->disableRefreshButton();
+            //$grid->disableToolbar();
             $grid->filter(function (Grid\Filter $filter) {
-                $filter->between('created_at', "訪問時間")->datetime()->width(4);
+                $filter->between('created_at', "時間")->datetime()->width(4);
                 $filter->equal('ip')->width(3);
                 $filter->equal('url')->width(3);
                 $filter->equal('method','請求方式')->select(['GET'=>'GET','POST'=>'POST'])->width(2);
@@ -100,6 +111,12 @@ STYLE
                 $filter->panel();
                 $filter->expand();
             });
+
+            $grid->export();
+
+            $grid->toolsWithOutline(false);
+            $grid->export()->disableExportCurrentPage();
+            $grid->export()->disableExportSelectedRow();
 
             $grid->disableRowSelector();
             $grid->disableActions();

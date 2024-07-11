@@ -22,7 +22,7 @@ class PageBounce extends Card
         parent::init();
 
         $this->title('网站跳出率');
-
+        $dropdown['customize'] = '自定义';
         $dropdown['today'] = '今日';
         $dropdown['yesterday'] = '昨日';
         $dropdown['week'] = '本周';
@@ -65,11 +65,11 @@ class PageBounce extends Card
         $access_log = new AccessLog();
 
 
-        $range = $request->get('option',date('n'));
+        $range = $request->get('option','customize');
         $dateRange = DateRangeHelper::getDateRange($range);
 
 
-        $access_log = $access_log->where('method','GET')->where('crawler',null)->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->select('ip','url','crawler')->get();
+        $access_log = $access_log->where('method','GET')->where('crawler',null)->where('device','<>','unknown')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->select('ip','url','crawler')->get();
 
 
         // 初始化跳出会话和总会话数量的数组

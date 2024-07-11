@@ -21,7 +21,7 @@ class BounceBar extends Bar
         parent::init();
 
         $this->title('跳出最多的页面（前10个）<br>');
-
+        $dropdown['customize'] = '自定义';
         $dropdown['today'] = '今日';
         $dropdown['yesterday'] = '昨日';
         $dropdown['week'] = '本周';
@@ -45,7 +45,7 @@ class BounceBar extends Bar
     public function handle(Request $request)
     {
 
-        $range = $request->get('option',date('n'));
+        $range = $request->get('option','customize');
         $dateRange = DateRangeHelper::getDateRange($range);
         $start = $dateRange['start'];
         $end = $dateRange['end'];
@@ -53,6 +53,7 @@ class BounceBar extends Bar
         $uniqueIpLogs = AccessLog::select('ip', 'method','url', 'created_at')
             ->where('method', 'GET')
             ->where('crawler',null)
+            ->where('device','<>','unknown')
             ->whereBetween('created_at', [$start, $end])
             ->get();
 
