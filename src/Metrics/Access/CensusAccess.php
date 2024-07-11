@@ -24,6 +24,7 @@ class CensusAccess extends Round
             '30' => 'Last Month',
             '365' => 'Last Year',
         ]);*/
+
     }
 
     /**
