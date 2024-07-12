@@ -74,7 +74,7 @@ STYLE
 
 
 
-            $row->column(3,$this->rightStatistics());
+            //$row->column(3,$this->rightStatistics());
 
 
 
