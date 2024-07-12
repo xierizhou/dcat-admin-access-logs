@@ -6,7 +6,6 @@ use Carbon\Carbon;
 
 use Illuminate\Support\Facades\Redis;
 use Jou\AccessLog\AccessLogServiceProvider;
-use Jou\AccessLog\Handlers\DeviceTypeHandlers;
 use Jou\AccessLog\Metrics\Access\MonthAccess;
 use Jou\AccessLog\Metrics\Access\OrderConversion;
 use Jou\AccessLog\Metrics\Access\OrderRepeat;
@@ -19,7 +18,7 @@ use Dcat\Admin\Layout\Content;
 use Dcat\Admin\Admin;
 use Dcat\Admin\Layout\Row;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Arr;
+
 
 class AccessLogController extends Controller
 {
@@ -108,7 +107,27 @@ STYLE
                 $filter->equal('method','請求方式')->select(['GET'=>'GET','POST'=>'POST'])->width(2);
                 $filter->equal('host','域名')->width(3);
                 $filter->in('device','設備')->width(3)->multipleSelect(['iphone' => 'iphone','android' => 'android','ipad' => 'ipad','windows' => 'windows','mac' => 'Mac','linux'=>'linux','unknown'=>'unknown']);
-                $filter->like('user_agent','载具')->width(3);
+                $filter->where('crawler',function ($query){
+                    $input = $this->input;
+                    if($input == 'googlebot'){
+                        $query->where('crawler','googlebot');
+                    }elseif ($input == 'other_bot'){
+                        $query->whereNull('crawler')->where('device','unknown');
+                    }elseif($input == 'all_bot'){
+                        $query->where(function ($query){
+                            $query->where('crawler','googlebot')->orWhere('device','unknown');
+                        });
+
+                    }elseif($input == 'exp_bot'){
+                        $query->whereNull('crawler')->where('device','<>','unknown');
+                    }
+                },'搜索引擎')->select([
+                    'all'=>'全部',
+                    'googlebot'=>'Googlebot',
+                    'other_bot'=>'其它的蜘蛛',
+                    'all_bot'=>'所有蜘蛛访问',
+                    'exp_bot'=>'正常用户访问',
+                ])->width(3);
                 $filter->panel();
                 $filter->expand();
             });

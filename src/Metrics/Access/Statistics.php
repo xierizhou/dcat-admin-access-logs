@@ -80,9 +80,25 @@ class Statistics extends Card
             $access_log = $access_log->whereIn('device',$request->get('device'));
         }
 
+        if($request->get('crawler')){
+            $crawler = $request->get('crawler');
+            if($crawler == 'googlebot'){
+                $access_log = $access_log->where('crawler','googlebot');
+            }elseif ($crawler == 'other_bot'){
+                $access_log = $access_log->whereNull('crawler')->where('device','unknown');
+            }elseif($crawler == 'all_bot'){
+                $access_log = $access_log->where(function ($query){
+                    $query->where('crawler','googlebot')->orWhere('device','unknown');
+                });
+
+            }elseif($crawler == 'exp_bot'){
+                $access_log = $access_log->whereNull('crawler')->where('device','<>','unknown');
+            }
+        }
+
 
         // 分页查询参数
-        $pageSize = 5000; // 每次查询1000条记录
+        $pageSize = 100000; // 每次查询1000条记录
 
         // 初始化分页
         $page = 1;

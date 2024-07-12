@@ -51,7 +51,7 @@ class BounceBar extends Bar
         $end = $dateRange['end'];
 
         // 分页查询参数
-        $pageSize = 20000; // 每次查询1000条记录
+        $pageSize = 100000; // 每次查询1000条记录
 
         // 初始化跳出会话和总会话数量的数组
         $bounceRates = [];

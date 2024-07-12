@@ -69,7 +69,7 @@ class PageBounce extends Card
         $dateRange = DateRangeHelper::getDateRange($range);
 
         // 分页查询参数
-        $pageSize = 10000; // 每次查询1000条记录
+        $pageSize = 100000; // 每次查询100000条记录
 
         // 初始化跳出会话和总会话数量的数组
         $bounceRates = [];
@@ -107,8 +107,6 @@ class PageBounce extends Card
         }while(!$access_log->isEmpty());
 
 
-
-
         $out = 0;
         $count = count($bounceRates);
         foreach ($bounceRates as $key=>$value){
@@ -116,7 +114,6 @@ class PageBounce extends Card
                 $out++;
             }
         }
-
 
         $rate = ($out/$count)*100;
         $this->withContent(round($rate,2).'<span class="font-md-2"> %</span>');
