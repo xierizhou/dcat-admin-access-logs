@@ -54,8 +54,6 @@ class OrderRepeat extends Card
     public function handle(Request $request)
     {
 
-        $access_log = new AccessLog();
-
         $range = $request->get('option','customize');
 
         $dateRange = DateRangeHelper::getDateRange($range);
