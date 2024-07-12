@@ -32,7 +32,7 @@ class PageBounce extends Card
 
         $chart = Modal::make()
             ->id('bouncemodal')
-            ->delay(3)
+            ->delay(10)
             ->lg()
             ->title('详细报表')
             ->body(BounceBar::make())
@@ -62,33 +62,50 @@ class PageBounce extends Card
      */
     public function handle(Request $request)
     {
-        $access_log = new AccessLog();
 
+        set_time_limit(0);
 
         $range = $request->get('option','customize');
         $dateRange = DateRangeHelper::getDateRange($range);
 
-
-        $access_log = $access_log->where('method','GET')->where('crawler',null)->where('device','<>','unknown')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->select('ip','url','crawler')->get();
-
+        // 分页查询参数
+        $pageSize = 10000; // 每次查询1000条记录
 
         // 初始化跳出会话和总会话数量的数组
         $bounceRates = [];
+        $page = 1;
 
-        // 遍历访问记录
-        foreach ($access_log as $log) {
-            $uri = $log->url;
-            $ipAddress = $log->ip;
 
-            // 初始化页面和 IP 地址的跳出会话和总会话数量
-            if (!isset($bounceRates[$ipAddress][$uri])) {
-                $bounceRates[$ipAddress][$uri] = 1;
+        //通过分页查询处理防止内存溢出
+        do{
+            $access_log = AccessLog::where('method', 'GET')
+                ->whereNull('crawler')
+                ->where('device', '<>', 'unknown')
+                ->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])
+                ->select('ip', 'url')
+                ->skip(($page - 1) * $pageSize)
+                ->take($pageSize)
+                ->get();
+
+
+            // 遍历访问记录
+            foreach ($access_log as $log) {
+                $uri = $log->url;
+                $ipAddress = $log->ip;
+
+                // 初始化页面和 IP 地址的跳出会话和总会话数量
+                if (!isset($bounceRates[$ipAddress][$uri])) {
+                    $bounceRates[$ipAddress][$uri] = 1;
+                }
+
+                // 记录总的访问会话数量
+                $bounceRates[$ipAddress][$uri]++;
+
             }
+            $page++;
 
-            // 记录总的访问会话数量
-            $bounceRates[$ipAddress][$uri]++;
+        }while(!$access_log->isEmpty());
 
-        }
 
 
 
@@ -100,10 +117,9 @@ class PageBounce extends Card
             }
         }
 
+
         $rate = ($out/$count)*100;
         $this->withContent(round($rate,2).'<span class="font-md-2"> %</span>');
-
-
 
     }
 

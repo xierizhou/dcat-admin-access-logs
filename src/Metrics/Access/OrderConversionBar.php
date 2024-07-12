@@ -52,36 +52,52 @@ class OrderConversionBar extends Bar
         $start = $dateRange['start'];
         $end = $dateRange['end'];
 
-        $logs = AccessLog::select('ip', 'method','url', 'created_at')
-            ->where('method', 'GET')
-            ->where('crawler',null)
-            ->where('device','<>','unknown')
-            ->whereBetween('created_at', [$start, $end])
-            ->orderBy('created_at','desc')
-            ->get();
+
 
         $order_model = AccessLogServiceProvider::setting('order_model');
 
-        $order_ips = app($order_model)->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->pluck('ip');
+        $order_ips = app($order_model)->whereBetween('created_at', [$start, $end])->pluck('ip');
 
 
-
+        // 分页查询参数
+        $pageSize = 20000; // 每次查询1000条记录
 
         // 初始化跳出会话和总会话数量的数组
         $bounceRates = [];
+        $page = 1;
 
-        // 遍历访问记录
-        foreach ($logs as $log) {
-            if($order_ips->contains($log->ip)){
-                continue;
+
+        //通过分页查询处理防止内存溢出
+        do{
+            $logs = AccessLog::where('method', 'GET')
+                ->whereNull('crawler')
+                ->where('device', '<>', 'unknown')
+                ->whereBetween('created_at', [$start, $end])
+                ->select('ip', 'url')
+                ->orderBy('created_at','desc')
+                ->skip(($page - 1) * $pageSize)
+                ->take($pageSize)
+                ->get();
+
+            // 遍历访问记录
+            foreach ($logs as $log) {
+                if($order_ips->contains($log->ip)){
+                    continue;
+                }
+
+                if (!isset($bounceRates[$log->ip])){
+                    $bounceRates[$log->ip] = $log->url;
+                }
+
+
             }
 
-            if (!isset($bounceRates[$log->ip])){
-                $bounceRates[$log->ip] = $log->url;
-            }
+            $page++;
+
+        }while(!$logs->isEmpty());
 
 
-        }
+
 
         $bounceData = [];
         foreach ($bounceRates as $item){

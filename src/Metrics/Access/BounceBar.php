@@ -50,31 +50,42 @@ class BounceBar extends Bar
         $start = $dateRange['start'];
         $end = $dateRange['end'];
 
-        $uniqueIpLogs = AccessLog::select('ip', 'method','url', 'created_at')
-            ->where('method', 'GET')
-            ->where('crawler',null)
-            ->where('device','<>','unknown')
-            ->whereBetween('created_at', [$start, $end])
-            ->get();
-
-
-
+        // 分页查询参数
+        $pageSize = 20000; // 每次查询1000条记录
 
         // 初始化跳出会话和总会话数量的数组
         $bounceRates = [];
+        $page = 1;
 
-        // 遍历访问记录
-        foreach ($uniqueIpLogs as $log) {
-            $uri = $log->url;
-            $ipAddress = $log->ip;
 
-            // 初始化页面和 IP 地址的跳出会话和总会话数量
-            if (!isset($bounceRates[$ipAddress][$uri])) {
-                $bounceRates[$ipAddress][$uri] = 1;
+        //通过分页查询处理防止内存溢出
+        do{
+            $uniqueIpLogs = AccessLog::where('method', 'GET')
+                ->whereNull('crawler')
+                ->where('device', '<>', 'unknown')
+                ->whereBetween('created_at', [$start,$end])
+                ->select('ip', 'url')
+                ->skip(($page - 1) * $pageSize)
+                ->take($pageSize)
+                ->get();
+
+
+            // 遍历访问记录
+            foreach ($uniqueIpLogs as $log) {
+                $uri = $log->url;
+                $ipAddress = $log->ip;
+
+                // 初始化页面和 IP 地址的跳出会话和总会话数量
+                if (!isset($bounceRates[$ipAddress][$uri])) {
+                    $bounceRates[$ipAddress][$uri] = 1;
+                }
+
+
             }
+            $page++;
 
+        }while(!$uniqueIpLogs->isEmpty());
 
-        }
 
         $bounceData = [];
         foreach ($bounceRates as $item){

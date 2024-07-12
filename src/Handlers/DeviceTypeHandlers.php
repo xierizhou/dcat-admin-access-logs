@@ -12,9 +12,12 @@ class DeviceTypeHandlers
         }
         $agent = strtolower($agent);
 
+
         $device_type = 'unknown';
 
         $device_type = (strpos($agent, 'windows')) ? 'windows' : $device_type;
+
+        $device_type = (strpos($agent, 'linux')) ? 'linux' : $device_type;
 
         $device_type = (strpos($agent, 'mac')) ? 'mac' : $device_type;
 
@@ -23,8 +26,6 @@ class DeviceTypeHandlers
         $device_type = (strpos($agent, 'ipad')) ? 'ipad' : $device_type;
 
         $device_type = (strpos($agent, 'android')) ? 'android' : $device_type;
-
-        $device_type = (strpos($agent, 'linux')) ? 'linux' : $device_type;
 
         return $device_type;
 

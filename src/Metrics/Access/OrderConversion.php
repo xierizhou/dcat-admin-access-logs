@@ -11,6 +11,7 @@ use Jou\AccessLog\Models\AccessLog;
 use Illuminate\Http\Request;
 use Dcat\Admin\Widgets\Metrics\Card;
 use Jou\AccessLog\Metrics\DateRangeHelper;
+use Jou\AccessLog\Renderable\OrderConversionBarLazy;
 
 
 class OrderConversion extends Card
@@ -38,10 +39,10 @@ class OrderConversion extends Card
 
         $chart = Modal::make()
             ->id('ordermodal')
-            ->delay(3)
+            ->delay(10)
             ->lg()
             ->title('详细报表')
-            ->body(OrderConversionBar::make())
+            ->body(OrderConversionBarLazy::make())
             ->button('<button class="btn btn-primary" style="position: absolute;right: 10px;top: 70px"><i class="feather icon-bar-chart-2"></i> 详细报表</button>');
         $this->header($chart);
 
@@ -66,7 +67,7 @@ class OrderConversion extends Card
 
         $dateRange = DateRangeHelper::getDateRange($range);
 
-        $access_log = $access_log->where('crawler',null)->where('device','<>','unknown')->where('method', 'GET')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->select('ip')->groupBy('ip')->get();
+        $access_log = $access_log->whereNull('crawler')->where('device','<>','unknown')->where('method', 'GET')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->select('ip')->groupBy('ip')->get();
 
         $access_count = $access_log->count();
 
