@@ -62,7 +62,7 @@ class OrderRepeat extends Card
 
 
         $order_model = AccessLogServiceProvider::setting('order_model');
-        $orders = app($order_model)->select('phone', \DB::raw('COUNT(*) as count'))->groupBy('phone')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where('status',2)->get();
+        $orders = app($order_model)->select('phone', \DB::raw('COUNT(*) as count'))->groupBy('phone')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where('status','>',0)->get();
         $data = [];
         foreach ($orders as $item){
             if(!isset($data[$item->count])){

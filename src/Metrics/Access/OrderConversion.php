@@ -72,7 +72,7 @@ class OrderConversion extends Card
         $access_count = $access_log->count();
 
         $order_model = AccessLogServiceProvider::setting('order_model');
-        $order_count = app($order_model)->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where('status',2)->count();
+        $order_count = app($order_model)->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where('status','>',0)->count();
 
         if($order_count && $order_count){
             $rate = ($order_count/$access_count)*100;
