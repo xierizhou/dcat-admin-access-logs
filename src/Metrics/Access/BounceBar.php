@@ -44,7 +44,8 @@ class BounceBar extends Bar
      */
     public function handle(Request $request)
     {
-
+        set_time_limit(0);
+        ini_set('memory_limit', '512m');
         $range = $request->get('option','customize');
         $dateRange = DateRangeHelper::getDateRange($range);
         $start = $dateRange['start'];
