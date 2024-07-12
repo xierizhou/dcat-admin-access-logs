@@ -86,7 +86,12 @@ class OrderConversionBar extends Bar
                 }
 
                 if (!isset($bounceRates[$log->ip])){
-                    $bounceRates[$log->ip] = $log->url;
+                    $bounceRates[$log->ip][] = $log->url;
+                }else{
+                    if(!in_array($log->url,$bounceRates[$log->ip])){
+                        $bounceRates[$log->ip][] = $log->url;
+                    }
+
                 }
 
 
@@ -97,15 +102,17 @@ class OrderConversionBar extends Bar
         }while(!$logs->isEmpty());
 
 
-
-
         $bounceData = [];
         foreach ($bounceRates as $item){
-            if (!isset($bounceData[$item])){
-                $bounceData[$item] = 1;
-            }else{
-                $bounceData[$item]++;
+            if(count($item) > 1){
+                $uri = array_get($item,0);
+                if (!isset($bounceData[$uri])){
+                    $bounceData[$uri] = 1;
+                }else{
+                    $bounceData[$uri]++;
+                }
             }
+
         }
 
 
