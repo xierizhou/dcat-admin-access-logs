@@ -66,8 +66,7 @@ class PageBounce extends Card
     public function handle(Request $request)
     {
 
-        set_time_limit(0);
-        ini_set('memory_limit', '512m');
+
         $range = $request->get('option','customize');
         Cache::set('page_bounce_range',$range);
         $dateRange = DateRangeHelper::getDateRange($range);
@@ -76,7 +75,8 @@ class PageBounce extends Card
 
 
         if(!Cache::has($cache_key)){
-
+            set_time_limit(0);
+            ini_set('memory_limit', '512m');
             // 分页查询参数
             $pageSize = 80000; // 每次查询100000条记录
 

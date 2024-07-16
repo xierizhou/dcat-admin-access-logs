@@ -113,9 +113,12 @@ class OrderRepeat extends Card
      */
     public function withContent($data,$new_customer)
     {
+        $count = array_sum($data);
+        $rate = round($new_customer / $count *100,2);
         $html = '';
+        $new_html = '';
         if($new_customer){
-            $html .= '<p>新客：'.$new_customer.'</p>';
+            $new_html = '<div class="tfo"><span>新客占：<b>'.$rate.'%</b></span><span>新客：<b>'.$new_customer.'</b></span><span>下单人数：<b>'.$count.'</b></span></div>';
         }
         foreach ($data as $k=>$v){
             $html .= '<p>'.$k.'單：'.$v.'</p>';
@@ -130,7 +133,7 @@ class OrderRepeat extends Card
     .repeat{
         display: flex;
         flex-wrap: wrap;
-        padding: 0.6rem;
+        padding: 0.6rem 1.1rem;
     }
     .repeat p{
         margin-right: 5px;
@@ -141,7 +144,22 @@ class OrderRepeat extends Card
         background-color: #eee;
         font-size: 12px;
     }
+    .new-cus{
+       padding: 0 1.1rem;
+       margin-bottom: 0.6rem;
+    }
+    .new-cus .tfo span{
+           display: inline-block;
+           margin-right: 20px;
+           font-weight: 400;
+    }
+    .new-cus .tfo span b{
+        
+    }
 </style>
+<div class="new-cus">
+$new_html
+</div>
 <div class="repeat">
 $html
 </div>
