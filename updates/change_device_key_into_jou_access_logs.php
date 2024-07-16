@@ -14,11 +14,7 @@ class ChangeCreatedAtKeyIntoJouAccessLogs extends Migration
     public function up()
     {
         Schema::table('jou_access_logs', function (Blueprint $table) {
-            $table->index('device');
-            $table->index('method');
-            $table->index('crawler');
-
-
+            $table->index('created_at');
         });
     }
 
@@ -30,9 +26,7 @@ class ChangeCreatedAtKeyIntoJouAccessLogs extends Migration
     public function down()
     {
         Schema::table('jou_access_logs', function (Blueprint $table) {
-            $table->dropIndex('jou_access_logs_device_index');
-            $table->dropIndex('jou_access_logs_method_index');
-            $table->dropIndex('jou_access_logs_crawler_index');
+            $table->dropIndex('jou_access_logs_created_at_index');
         });
     }
 }

@@ -3,8 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
-class ChangeCreatedAtKeyIntoJouAccessLogs extends Migration
+use Jou\AccessLog\Models\AccessLog as AccessLogModel;
+class AddDescribeIntoProducts extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,10 @@ class ChangeCreatedAtKeyIntoJouAccessLogs extends Migration
      */
     public function up()
     {
+        AccessLogModel::where('user_agent','like','%Android%')->update(['device'=>'android']);
+
         Schema::table('jou_access_logs', function (Blueprint $table) {
-            $table->index('device');
-            $table->index('method');
-            $table->index('crawler');
-
-
+            $table->string('ipcountry')->nullable()->after('ip');
         });
     }
 
@@ -30,9 +28,7 @@ class ChangeCreatedAtKeyIntoJouAccessLogs extends Migration
     public function down()
     {
         Schema::table('jou_access_logs', function (Blueprint $table) {
-            $table->dropIndex('jou_access_logs_device_index');
-            $table->dropIndex('jou_access_logs_method_index');
-            $table->dropIndex('jou_access_logs_crawler_index');
+            $table->dropColumn('ipcountry');
         });
     }
 }

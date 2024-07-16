@@ -84,6 +84,7 @@ class AccessLogMiddleware
             $request->getHost(),
             Arr::get($_SERVER,'HTTP_REFERER'),
             $request->header('cf-connecting-ip',$request->ip()),
+            $request->header('cf-ipcountry',null),
             $request->userAgent() ,
             $request->toArray(),
             $request->header()

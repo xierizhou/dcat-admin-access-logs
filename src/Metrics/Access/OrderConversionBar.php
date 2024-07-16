@@ -4,7 +4,7 @@
 namespace Jou\AccessLog\Metrics\Access;
 
 
-use App\Models\Order;
+use Illuminate\Support\Facades\Cache;
 use Jou\AccessLog\AccessLogServiceProvider;
 use Jou\AccessLog\Metrics\Bar;
 use Jou\AccessLog\Metrics\DateRangeHelper;
@@ -22,19 +22,16 @@ class OrderConversionBar extends Bar
     {
         parent::init();
 
-        $this->title('订单流失页面报表（前10个）<br>');
-        $dropdown['customize'] = '自定义';
-        $dropdown['today'] = '今日';
-        $dropdown['yesterday'] = '昨日';
-        $dropdown['week'] = '本周';
-        $dropdown['last_week'] = '上周';
-        $dropdown['month'] = '本月';
-        $dropdown['last_month'] = '上月';
+        $this->title('订单流失页面报表（前15个）<br>');
+        $dropdown['all'] = '全部';
+        $dropdown['pc'] = '桌面版';
+        $dropdown['m'] = '移动版';
+
         $this->dropdown($dropdown);
 
-        $this->chartHeight(250);
+        $this->chartHeight(350);
 
-        $this->content('<span style="padding: 16px;color: #999">统计没有下单的用户，最终在哪个页面跑了</span>');
+        $this->content('<span style="padding: 16px;color: #999">统计没有下单的用户，最终在哪个页面退出了网站</span>');
     }
 
     /**
@@ -48,13 +45,11 @@ class OrderConversionBar extends Bar
     {
         set_time_limit(0);
         ini_set('memory_limit', '512m');
-
-        $range = $request->get('option','customize');
+        $option = $request->get('option','all');
+        $range =  Cache::get('order_conversion_range','customize');
         $dateRange = DateRangeHelper::getDateRange($range);
         $start = $dateRange['start'];
         $end = $dateRange['end'];
-
-
 
         $order_model = AccessLogServiceProvider::setting('order_model');
 
@@ -72,9 +67,17 @@ class OrderConversionBar extends Bar
         //通过分页查询处理防止内存溢出
         do{
             $logs = AccessLog::where('method', 'GET')
-                ->whereNull('crawler')
-                ->where('device', '<>', 'unknown')
-                ->whereBetween('created_at', [$start, $end])
+                ->whereNull('crawler');
+
+            if($option == 'pc'){
+                $logs = $logs->whereIn('device', ['windows','mac','linux']);
+            }elseif($option == 'm'){
+                $logs = $logs->whereIn('device', ['iphone','android','ipad']);
+            }else{
+                $logs = $logs->where('device', '<>', 'unknown');
+            }
+
+            $logs = $logs->whereBetween('created_at', [$start, $end])
                 ->select('ip', 'url')
                 ->orderBy('created_at','desc')
                 ->skip(($page - 1) * $pageSize)
@@ -117,10 +120,13 @@ class OrderConversionBar extends Bar
 
         }
 
+        unset($bounceData['/captcha/flat']);
+
+        unset($bounceData['/get/carts']);
 
         arsort($bounceData);
 
-        $bounceData = array_slice($bounceData,0,10);
+        $bounceData = array_slice($bounceData,0,15);
 
         $categories = array_keys($bounceData);
         $data = array_values($bounceData);

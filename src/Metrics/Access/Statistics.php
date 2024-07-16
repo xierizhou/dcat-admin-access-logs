@@ -6,6 +6,7 @@ use Dcat\Admin\Widgets\Metrics\Card;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Jou\AccessLog\Helper;
 use Jou\AccessLog\Models\AccessLog;
 
 class Statistics extends Card
@@ -25,7 +26,7 @@ class Statistics extends Card
     {
 
         $this->data = [];
-
+        $this->height(173);
         parent::__construct();
     }
 
@@ -127,21 +128,7 @@ class Statistics extends Card
                 $total_ip_count[$item->ip] = 1;
 
 
-                $agent = strtolower($item->user_agent);
-
-                $device_type = 'unknown';
-
-
-                $device_type = (strpos($agent, 'windows')) ? 'windows' : $device_type;
-
-                $device_type = (strpos($agent, 'mac')) ? 'mac' : $device_type;
-
-                $device_type = (strpos($agent, 'iphone')) ? 'iphone' : $device_type;
-
-                $device_type = (strpos($agent, 'ipad')) ? 'ipad' : $device_type;
-
-                $device_type = (strpos($agent, 'android')) ? 'android' : $device_type;
-
+                $device_type = Helper::device($item->user_agent);
 
                 $device_count[$device_type][] = $item->ip;
 
@@ -156,7 +143,6 @@ class Statistics extends Card
 
             $page++;
         }while(!$access->isEmpty());
-
 
 
 
@@ -243,15 +229,10 @@ HTML;
     gap: 10px;
 }
 .statices-block{
-
-    width: 48%;
     background-color: #fff;
-
-
-    border-radius: .25rem;
     color: #333;
     text-align: left;
-    padding: .5rem 1.1rem;
+    padding: .5rem 1rem;
 }
 .statices-block .lab{
     font-size: 12px;
@@ -281,7 +262,7 @@ HTML;
             <span class="text">其它：$unknown_count ｜ IP：$unknown_count_ip </span>
         </div>
         <div class="statices-block">
-            <span class="lab">移动版（Mobile & ipad）</span>
+            <span class="lab">移动版（Mobile & iPad）</span>
             <span class="text">总量：$m_count ｜ IP：$m_ip_count </span>
             <span class="text">iPhone：$iphone_count ｜ IP：$iphone_count_ip </span>
             <span class="text">Android：$android_count ｜ IP：$android_count_ip </span>

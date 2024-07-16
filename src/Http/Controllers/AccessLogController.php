@@ -82,6 +82,7 @@ STYLE
             //$row->column(12,$this->rightStatistics());
             $row->column(12,$this->lists());
         });
+
         return $content;
     }
 

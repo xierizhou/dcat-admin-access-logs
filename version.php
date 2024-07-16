@@ -34,5 +34,13 @@ return [
     ],
     '1.2.2' => [
         '二级域名记录失效问题修复'
+    ],
+    '2.0.0' => [
+        '增加更多的统计',
+        'change_created_at_key_into_jou_access_logs.php',
+    ],
+    '2.0.1' => [
+        '增加地区字段',
+        'add_ipcounty_into_jou_access_logs.php',
     ]
 ];

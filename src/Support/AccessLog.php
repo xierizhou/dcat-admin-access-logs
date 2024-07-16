@@ -6,7 +6,7 @@ use Jou\AccessLog\Models\AccessLog as AccessLogModel;
 
 class AccessLog
 {
-    private $path,$method,$host,$referer,$ip,$user_agent,$response,$parameter,$header;
+    private $path,$method,$host,$referer,$ip,$ipcountry,$user_agent,$response,$parameter,$header;
 
 
     /**
@@ -16,12 +16,13 @@ class AccessLog
      * @param $host
      * @param $referer
      * @param $ip
+     * @param $ipcountry
      * @param $user_agent
      * @param $response
      * @param array $parameter
      * @param array $header
      */
-    public function __construct($path,$method,$host,$referer,$ip,$user_agent,$parameter=[],$header=[],$response=null)
+    public function __construct($path,$method,$host,$referer,$ip,$ipcountry,$user_agent,$parameter=[],$header=[],$response=null)
     {
 
         $this->path = $path;
@@ -29,6 +30,7 @@ class AccessLog
         $this->host = $host;
         $this->referer = $referer;
         $this->ip = $ip;
+        $this->ipcountry = $ipcountry;
         $this->user_agent = $user_agent;
         $this->parameter = $parameter;
         $this->header = $header;
@@ -51,11 +53,13 @@ class AccessLog
             'host'=>$this->host,
             'referer'=>$this->referer,
             'ip'=>$this->ip,
+            'ipcountry'=>$this->ipcountry,
             'user_agent'=>$this->user_agent,
             'device'=>DeviceTypeHandlers::getDevice($this->user_agent),
             'crawler'=>DeviceTypeHandlers::getCrawler($this->user_agent),
             'parameter'=>$this->parameter,
             'headers'=>$this->header,
+
             //'response'=>$this->response
         ];
 

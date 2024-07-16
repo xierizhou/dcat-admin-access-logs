@@ -5,6 +5,7 @@ namespace Jou\AccessLog\Metrics\Access;
 
 
 use Jou\AccessLog\Metrics\Bar;
+use Jou\AccessLog\Metrics\DateRangeHelper;
 use Jou\AccessLog\Models\AccessLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -21,11 +22,14 @@ class PageAccess extends Bar
         parent::init();
 
         $this->title('页面最多訪問(前10個)');
-        $this->dropdown([
-            '7' => '最近7天',
-            '15' => '最近15天',
-            '30' => '最近1個月',
-        ]);
+        $dropdown['customize'] = '自定义';
+        $dropdown['today'] = '今日';
+        $dropdown['yesterday'] = '昨日';
+        $dropdown['week'] = '本周';
+        $dropdown['last_week'] = '上周';
+        $dropdown['month'] = '本月';
+        $dropdown['last_month'] = '上月';
+        $this->dropdown($dropdown);
 
         $this->chartHeight(250);
 
@@ -42,8 +46,9 @@ class PageAccess extends Bar
     public function handle(Request $request)
     {
         $access_log = new AccessLog();
-
-        $access_log = $access_log->where('method','GET')->whereBetWeen('created_at',[Carbon::now()->subDays($request->get('option',7)),Carbon::now()->endOfDay()])->selectRaw('url, count(id) as num')->groupBy('url')->orderBy('num','desc')->limit(10)->get();
+        $range = $request->get('option','customize');
+        $dateRange = DateRangeHelper::getDateRange($range);
+        $access_log = $access_log->where('method','GET')->whereBetWeen('created_at',[$dateRange['start'],$dateRange['end']])->selectRaw('url, count(id) as num')->groupBy('url')->orderBy('num','desc')->limit(10)->get();
         $categories = [];
         $data = [];
         foreach($access_log as $item){
@@ -84,7 +89,7 @@ class PageAccess extends Bar
     {
         return $this->content(
             <<<HTML
-<div class="d-flex justify-content-between align-items-center mt-1" style="margin-bottom: 2px">
+<div class="d-flex justify-content-between align-items-center" style="margin-bottom: 2px">
     <h2 class="ml-1 font-lg-1">{$content}</h2>
     <span class="mb-0 mr-1 text-80">{$this->title}</span>
 </div>

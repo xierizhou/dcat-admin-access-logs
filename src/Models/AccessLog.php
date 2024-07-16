@@ -16,7 +16,7 @@ class AccessLog extends Model
     protected $table = 'jou_access_logs';
 
     protected $fillable = [
-        'url','method','host','referer','ip','user_agent','device','crawler','parameter','headers','response'
+        'url','method','host','referer','ip','ipcountry','user_agent','device','crawler','parameter','headers','response'
     ];
 
     protected $casts = [
