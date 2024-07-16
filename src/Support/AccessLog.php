@@ -66,6 +66,7 @@ class AccessLog
         try{
             $model->create($data);
         }catch (\Exception $exception){
+            file_put_contents(public_path('./error.log'),$exception->getMessage());
         }
 
 
