@@ -13,7 +13,7 @@ class AddDescribeIntoProducts extends Migration
      */
     public function up()
     {
-        AccessLogModel::where('user_agent','like','%Android%')->update(['device'=>'android']);
+        //AccessLogModel::where('user_agent','like','%Android%')->update(['device'=>'android']);
 
         Schema::table('jou_access_logs', function (Blueprint $table) {
             $table->string('ipcountry')->nullable()->after('ip');
