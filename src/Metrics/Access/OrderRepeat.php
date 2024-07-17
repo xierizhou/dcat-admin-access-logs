@@ -64,7 +64,7 @@ class OrderRepeat extends Card
         if(!Cache::has($cache_key)){
             $order_model = AccessLogServiceProvider::setting('order_model');
             $orders = app($order_model)->select('phone', \DB::raw('COUNT(*) as count'))->groupBy('phone')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where('status','>',0)->get();
-            $phone2 = app($order_model)->where('created_at','<',$dateRange['start'])->pluck('phone');
+            $phone2 = app($order_model)->where('created_at','<',$dateRange['start'])->where('status','>',0)->pluck('phone');
 
             $order_total_price = app($order_model)->select('total_price')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where('status','>',0)->sum('total_price');
 
