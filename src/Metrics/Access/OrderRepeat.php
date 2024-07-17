@@ -60,10 +60,14 @@ class OrderRepeat extends Card
         $dateRange = DateRangeHelper::getDateRange($range);
 
         $cache_key = md5('order_repeat'.$dateRange['start'].$dateRange['end']);
+
         if(!Cache::has($cache_key)){
             $order_model = AccessLogServiceProvider::setting('order_model');
             $orders = app($order_model)->select('phone', \DB::raw('COUNT(*) as count'))->groupBy('phone')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where('status','>',0)->get();
             $phone2 = app($order_model)->where('created_at','<',$dateRange['start'])->pluck('phone');
+
+            $order_total_price = app($order_model)->select('total_price')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where('status','>',0)->sum('total_price');
+
 
 
             $phone = [];
@@ -88,7 +92,7 @@ class OrderRepeat extends Card
             ksort($data);
 
             Cache::set($cache_key,[
-                'data'=>$data,'new_customer'=>$new_customer
+                'data'=>$data,'new_customer'=>$new_customer,'order_total_price'=>$order_total_price,
             ],1800); //缓存半小时
         }else{
             $cache_data = Cache::get($cache_key);
@@ -96,9 +100,11 @@ class OrderRepeat extends Card
             $data = $cache_data['data'];
 
             $new_customer = $cache_data['new_customer'];
+
+            $order_total_price = isset($cache_data['order_total_price'])?round($cache_data['order_total_price']):0;
         }
 
-        $this->withContent($data,$new_customer);
+        $this->withContent($data,$new_customer,$order_total_price);
 
     }
 
@@ -108,17 +114,23 @@ class OrderRepeat extends Card
      *
      * @param array $data
      * @param integer $new_customer
-     *
+     * @param string $order_total_price
      * @return $this
      */
-    public function withContent($data,$new_customer)
+    public function withContent($data,$new_customer,$order_total_price=null)
     {
+
         $count = array_sum($data);
-        $rate = round($new_customer / $count *100,2);
+        $rate = 0;
+        if($count){
+            $rate = round($new_customer / $count *100,2);
+        }
+
+
         $html = '';
         $new_html = '';
         if($new_customer){
-            $new_html = '<div class="tfo"><span>新客占：<b>'.$rate.'%</b></span><span>新客：<b>'.$new_customer.'</b></span><span>下单人数：<b>'.$count.'</b></span></div>';
+            $new_html = '<div class="tfo"><span>新客占：<b>'.$rate.'%</b></span><span>新客：<b>'.$new_customer.'</b></span><span>人数：<b>'.$count.'</b></span><span>金额：<b>'.$order_total_price.'</b></span></div>';
         }
         foreach ($data as $k=>$v){
             $html .= '<p>'.$k.'單：'.$v.'</p>';
@@ -146,15 +158,19 @@ class OrderRepeat extends Card
     }
     .new-cus{
        padding: 0 1.1rem;
-       margin-bottom: 0.6rem;
+       margin-bottom: 0.4rem;
+       margin-top: 0.4rem;
     }
     .new-cus .tfo span{
-           display: inline-block;
-           margin-right: 20px;
-           font-weight: 400;
+       display: inline-block;
+       margin-right: 12px;
+       font-weight: 400;
+       font-size: 11px;
+       color: #999;
     }
     .new-cus .tfo span b{
-        
+        font-size: 14px;
+        color: #333;
     }
 </style>
 <div class="new-cus">
