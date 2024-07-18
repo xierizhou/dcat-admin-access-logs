@@ -92,7 +92,7 @@ class OrderRepeat extends Card
             ksort($data);
 
             Cache::set($cache_key,[
-                'data'=>$data,'new_customer'=>$new_customer,'order_total_price'=>$order_total_price,
+                'data'=>$data,'new_customer'=>$new_customer,'order_total_price'=>round($order_total_price),
             ],1800); //缓存半小时
         }else{
             $cache_data = Cache::get($cache_key);

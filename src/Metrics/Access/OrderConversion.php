@@ -46,7 +46,7 @@ class OrderConversion extends Card
             ->lg()
             ->title('详细报表')
             ->body(OrderConversionBarLazy::make())
-            ->button('<button class="btn btn-primary" style="position: absolute;right: 10px;top: 70px"><i class="feather icon-bar-chart-2"></i> 详细报表</button>');
+            ->button('<button class="btn btn-primary" style="position: absolute;right: 10px;top: 70px;font-size: 12px;padding: .5rem 1rem !important;"><i class="feather icon-bar-chart-2"></i> 报表</button>');
         $this->header($chart);
 
         $this->dropdown($dropdown);
