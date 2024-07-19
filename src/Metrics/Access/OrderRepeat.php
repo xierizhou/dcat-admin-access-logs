@@ -126,6 +126,10 @@ class OrderRepeat extends Card
             $rate = round($new_customer / $count *100,2);
         }
 
+        if($order_total_price){
+            $order_total_price = round($order_total_price);
+        }
+
 
         $html = '';
         $new_html = '';
