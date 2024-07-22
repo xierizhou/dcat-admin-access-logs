@@ -8,6 +8,7 @@ namespace Jou\AccessLog\Metrics\Access;
 use Dcat\Admin\Widgets\Modal;
 use Illuminate\Support\Facades\Cache;
 use Jou\AccessLog\AccessLogServiceProvider;
+use Jou\AccessLog\Helper;
 use Jou\AccessLog\Models\AccessLog;
 use Illuminate\Http\Request;
 use Dcat\Admin\Widgets\Metrics\Card;
@@ -66,8 +67,19 @@ class OrderRepeat extends Card
             $orders = app($order_model)->select('phone', \DB::raw('COUNT(*) as count'))->groupBy('phone')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where('status','>',0)->get();
             $phone2 = app($order_model)->where('created_at','<',$dateRange['start'])->where('status','>',0)->pluck('phone');
 
-            $order_total_price = app($order_model)->select('total_price')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where('status','>',0)->sum('total_price');
-
+            $order_ps = app($order_model)->select('total_price','user_agent')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where('status','>',0)->get();
+            $order_total_price = 0;
+            $order_pc_total_price = 0;
+            $order_m_total_price = 0;
+            foreach ($order_ps as $item){
+                $order_total_price += $item->total_price;
+                $device_type = Helper::device($item->user_agent);
+                if(in_array($device_type,['iphone','android','ipad'])){
+                    $order_m_total_price += $item->total_price;
+                }else{
+                    $order_pc_total_price += $item->total_price;
+                }
+            }
 
 
             $phone = [];
@@ -92,7 +104,7 @@ class OrderRepeat extends Card
             ksort($data);
 
             Cache::set($cache_key,[
-                'data'=>$data,'new_customer'=>$new_customer,'order_total_price'=>round($order_total_price),
+                'data'=>$data,'new_customer'=>$new_customer,'order_total_price'=>round($order_total_price),'order_m_total_price'=>round($order_m_total_price),'order_pc_total_price'=>round($order_pc_total_price)
             ],1800); //缓存半小时
         }else{
             $cache_data = Cache::get($cache_key);
@@ -102,9 +114,11 @@ class OrderRepeat extends Card
             $new_customer = $cache_data['new_customer'];
 
             $order_total_price = isset($cache_data['order_total_price'])?round($cache_data['order_total_price']):0;
+            $order_pc_total_price = isset($cache_data['order_pc_total_price'])?round($cache_data['order_pc_total_price']):0;
+            $order_m_total_price = isset($cache_data['order_m_total_price'])?round($cache_data['order_m_total_price']):0;
         }
 
-        $this->withContent($data,$new_customer,$order_total_price);
+        $this->withContent($data,$new_customer,$order_total_price,$order_pc_total_price,$order_m_total_price);
 
     }
 
@@ -117,7 +131,7 @@ class OrderRepeat extends Card
      * @param string $order_total_price
      * @return $this
      */
-    public function withContent($data,$new_customer,$order_total_price=null)
+    public function withContent($data,$new_customer,$order_total_price,$order_pc_total_price,$order_m_total_price)
     {
 
         $count = array_sum($data);
@@ -134,8 +148,11 @@ class OrderRepeat extends Card
         $html = '';
         $new_html = '';
         if($new_customer){
-            $new_html = '<div class="tfo"><span>新客占：<b>'.$rate.'%</b></span><span>新客：<b>'.$new_customer.'</b></span><span>人数：<b>'.$count.'</b></span><span>金额：<b>'.$order_total_price.'</b></span></div>';
+            $new_html = '<div class="tfo"><span>新客占：<b>'.$rate.'%</b></span><span>新客：<b>'.$new_customer.'</b></span><span>人数：<b>'.$count.'</b></span></div>';
         }
+        $new_html .= '<div class="tfo"><span>总金额：<b>'.$order_total_price.'</b></span><span>PC：<b>'.$order_pc_total_price.'</b></span><span>M：<b>'.$order_m_total_price.'</b></span></div>';
+
+
         foreach ($data as $k=>$v){
             $html .= '<p>'.$k.'單：'.$v.'</p>';
         }
@@ -162,12 +179,10 @@ class OrderRepeat extends Card
     }
     .new-cus{
        padding: 0 1.1rem;
-       margin-bottom: 0.4rem;
-       margin-top: 0.4rem;
     }
     .new-cus .tfo span{
        display: inline-block;
-       margin-right: 12px;
+       margin-right: 20px;
        font-weight: 400;
        font-size: 11px;
        color: #999;
