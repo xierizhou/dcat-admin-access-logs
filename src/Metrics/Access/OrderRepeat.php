@@ -13,6 +13,7 @@ use Jou\AccessLog\Models\AccessLog;
 use Illuminate\Http\Request;
 use Dcat\Admin\Widgets\Metrics\Card;
 use Jou\AccessLog\Metrics\DateRangeHelper;
+use Jou\AccessLog\Renderable\OrderRepeatTable;
 
 
 class OrderRepeat extends Card
@@ -43,6 +44,13 @@ class OrderRepeat extends Card
 
         $this->dropdown($dropdown);
 
+        $modal = Modal::make()
+            ->id('orderrepeat')
+            ->lg()
+            ->title('详细报表')
+            ->body(OrderRepeatTable::make())
+            ->button('<span style="position: absolute;right: 4px;top: 55px;font-size: 12px;padding: .5rem 1rem !important;"><i class="feather icon-bar-chart-2"></i> 详细报表</span>');
+        $this->header($modal);
 
     }
 
@@ -57,7 +65,7 @@ class OrderRepeat extends Card
     {
 
         $range = $request->get('option','customize');
-
+        Cache::set('order_repeat_range',$range);
         $dateRange = DateRangeHelper::getDateRange($range);
 
         $cache_key = md5('order_repeat'.$dateRange['start'].$dateRange['end']);
