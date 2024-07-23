@@ -49,7 +49,7 @@ class OrderRepeat extends Card
             ->lg()
             ->title('详细报表')
             ->body(OrderRepeatTable::make())
-            ->button('<span style="position: absolute;right: 4px;top: 55px;font-size: 12px;padding: .5rem 1rem !important;"><i class="feather icon-bar-chart-2"></i> 详细报表</span>');
+            ->button('<span style="position: absolute;right: 4px;top: 55px;font-size: 12px;padding: .5rem 1rem !important;"><i class="feather icon-bar-chart-2"></i> 详细报表</span>')->xl();
         $this->header($modal);
 
     }

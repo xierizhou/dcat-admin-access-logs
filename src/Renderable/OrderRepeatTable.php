@@ -54,6 +54,7 @@ class OrderRepeatTable extends LazyRenderable
             $grid->column('user_agent','载具')->display(function ($val){
                 return Helper::device($val);
             });
+            $grid->column('ip','IP');
             $grid->column('status','状态')->display(function ($val){
                 return Arr::get(Order::STATUS_TXT,$val);
             })->badge('success');
