@@ -149,8 +149,9 @@ class OrderRepeat extends Card
         $new_html = '';
         if($new_customer){
             $new_html = '<div class="tfo"><span>新客占：<b>'.$rate.'%</b></span><span>新客：<b>'.$new_customer.'</b></span><span>人数：<b>'.$count.'</b></span></div>';
+            $new_html .= '<div class="tfo"><span>总金额：<b>'.$order_total_price.'</b></span><span>PC：<b>'.$order_pc_total_price.'</b></span><span>M：<b>'.$order_m_total_price.'</b></span></div>';
         }
-        $new_html .= '<div class="tfo"><span>总金额：<b>'.$order_total_price.'</b></span><span>PC：<b>'.$order_pc_total_price.'</b></span><span>M：<b>'.$order_m_total_price.'</b></span></div>';
+
 
 
         foreach ($data as $k=>$v){
