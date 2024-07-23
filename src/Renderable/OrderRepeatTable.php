@@ -7,6 +7,7 @@ use Dcat\Admin\Grid;
 use Dcat\Admin\Grid\LazyRenderable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
+use Jou\AccessLog\Helper;
 use Jou\AccessLog\Metrics\DateRangeHelper;
 
 class OrderRepeatTable extends LazyRenderable
@@ -49,6 +50,9 @@ class OrderRepeatTable extends LazyRenderable
             $grid->column('no','订单号');
             $grid->column('total_price','订单金额')->display(function ($val){
                 return round($val);
+            });
+            $grid->column('user_agent','载具')->display(function ($val){
+                return Helper::device($val);
             });
             $grid->column('status','状态')->display(function ($val){
                 return Arr::get(Order::STATUS_TXT,$val);
