@@ -1,6 +1,4 @@
 数据需要校准，执行下面sql
-update jou_access_logs set device='android' where device='linux'
-update jou_access_logs set device='linux' where user_agent like "%Linux%" and user_agent not like "%Android%";
 
-或者
 update jou_access_logs set device='android' where user_agent like "%Android%";
+
