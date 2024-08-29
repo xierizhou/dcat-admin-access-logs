@@ -49,7 +49,7 @@ class OrderRepeat extends Card
             ->lg()
             ->title('详细报表')
             ->body(OrderRepeatTable::make())
-            ->button('<span style="position: absolute;right: 4px;top: 55px;font-size: 12px;padding: .5rem 1rem !important;"><i class="feather icon-bar-chart-2"></i> 详细报表</span>')->xl();
+            ->button('<span style="position: absolute;right: 4px;top: 55px;font-size: 12px;padding: .5rem 1rem !important;"><i class="feather icon-bar-chart-2"></i> 报表</span>')->xl();
         $this->header($modal);
 
     }
@@ -79,15 +79,20 @@ class OrderRepeat extends Card
             $order_total_price = 0;
             $order_pc_total_price = 0;
             $order_m_total_price = 0;
+            $pc_order_count = 0;
+            $m_order_count = 0;
             foreach ($order_ps as $item){
                 $order_total_price += $item->total_price;
                 $device_type = Helper::device($item->user_agent);
                 if(in_array($device_type,['iphone','android','ipad'])){
                     $order_m_total_price += $item->total_price;
+                    $m_order_count++;
                 }else{
                     $order_pc_total_price += $item->total_price;
+                    $pc_order_count++;
                 }
             }
+            $order_count = $order_ps->count();
 
 
             $phone = [];
@@ -111,8 +116,19 @@ class OrderRepeat extends Card
 
             ksort($data);
 
+            $average_price = round($order_total_price/$order_count);
+            $pc_average_price = round($order_pc_total_price/$pc_order_count);
+            $m_average_price = round($order_m_total_price/$m_order_count);
+
             Cache::set($cache_key,[
-                'data'=>$data,'new_customer'=>$new_customer,'order_total_price'=>round($order_total_price),'order_m_total_price'=>round($order_m_total_price),'order_pc_total_price'=>round($order_pc_total_price)
+                'data'=>$data,
+                'new_customer'=>$new_customer,
+                'order_total_price'=>round($order_total_price),
+                'order_m_total_price'=>round($order_m_total_price),
+                'order_pc_total_price'=>round($order_pc_total_price),
+                'average_price' => round($order_total_price/$order_count),
+                'pc_average_price' => round($order_pc_total_price/$pc_order_count),
+                'm_average_price' => round($order_m_total_price/$m_order_count),
             ],1800); //缓存半小时
         }else{
             $cache_data = Cache::get($cache_key);
@@ -124,22 +140,40 @@ class OrderRepeat extends Card
             $order_total_price = isset($cache_data['order_total_price'])?round($cache_data['order_total_price']):0;
             $order_pc_total_price = isset($cache_data['order_pc_total_price'])?round($cache_data['order_pc_total_price']):0;
             $order_m_total_price = isset($cache_data['order_m_total_price'])?round($cache_data['order_m_total_price']):0;
+
+            $average_price = isset($cache_data['average_price'])?round($cache_data['average_price']):0;
+            $pc_average_price = isset($cache_data['pc_average_price'])?round($cache_data['pc_average_price']):0;
+            $m_average_price = isset($cache_data['m_average_price'])?round($cache_data['m_average_price']):0;
         }
 
-        $this->withContent($data,$new_customer,$order_total_price,$order_pc_total_price,$order_m_total_price);
+        $this->withContent(
+            $data,
+            $new_customer,
+            $order_total_price,
+            $order_pc_total_price,
+            $order_m_total_price,
+            $average_price,
+            $pc_average_price,
+            $m_average_price
+        );
 
     }
 
 
+
     /**
-     * 设置卡片内容.
-     *
-     * @param array $data
-     * @param integer $new_customer
-     * @param string $order_total_price
-     * @return $this
+     * 设置卡片内容
+     * @param $data
+     * @param $new_customer
+     * @param $order_total_price
+     * @param $order_pc_total_price
+     * @param $order_m_total_price
+     * @param $average_price
+     * @param $pc_average_price
+     * @param $m_average_price
+     * @return OrderRepeat
      */
-    public function withContent($data,$new_customer,$order_total_price,$order_pc_total_price,$order_m_total_price)
+    public function withContent($data,$new_customer,$order_total_price,$order_pc_total_price,$order_m_total_price,$average_price,$pc_average_price,$m_average_price)
     {
 
         $count = array_sum($data);
@@ -158,12 +192,13 @@ class OrderRepeat extends Card
         if($new_customer){
             $new_html = '<div class="tfo"><span>新客占：<b>'.$rate.'%</b></span><span>新客：<b>'.$new_customer.'</b></span><span>人数：<b>'.$count.'</b></span></div>';
             $new_html .= '<div class="tfo"><span>总金额：<b>'.$order_total_price.'</b></span><span>PC：<b>'.$order_pc_total_price.'</b></span><span>M：<b>'.$order_m_total_price.'</b></span></div>';
+            $new_html .= '<div class="tfo"><span>均客价：<b>'.$average_price.'</b></span><span>PC：<b>'.$pc_average_price.'</b></span><span>M：<b>'.$m_average_price.'</b></span></div>';
         }
 
 
 
         foreach ($data as $k=>$v){
-            $html .= '<p>'.$k.'單：'.$v.'</p>';
+            $html .= '<p>'.$k.'單：<b>'.$v.'</b></p>';
         }
         if(!$html){
             $html = '<div style="width: 100%;color: #999;margin-left: 10px">暂无数据</div>';
@@ -180,11 +215,12 @@ class OrderRepeat extends Card
     .repeat p{
         margin-right: 5px;
         border: 1px solid #eee;
-        padding: 0.2rem 0.4rem;
+        padding: 0.1rem 0.2rem;
         border-radius: 0.2rem;
         margin-bottom: 5px;
         background-color: #eee;
-        font-size: 12px;
+        font-size: 11px;
+        color: #333;
     }
     .new-cus{
        padding: 0 1.1rem;
