@@ -128,9 +128,9 @@ class OrderRepeat extends Card
                 'order_total_price'=>round($order_total_price),
                 'order_m_total_price'=>round($order_m_total_price),
                 'order_pc_total_price'=>round($order_pc_total_price),
-                'average_price' => round($order_total_price/$order_count),
-                'pc_average_price' => round($order_pc_total_price/$pc_order_count),
-                'm_average_price' => round($order_m_total_price/$m_order_count),
+                'average_price' => $average_price,
+                'pc_average_price' => $pc_average_price,
+                'm_average_price' => $m_average_price,
             ],1800); //缓存半小时
         }else{
             $cache_data = Cache::get($cache_key);
