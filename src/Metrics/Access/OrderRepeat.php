@@ -81,6 +81,7 @@ class OrderRepeat extends Card
             $order_m_total_price = 0;
             $pc_order_count = 0;
             $m_order_count = 0;
+
             foreach ($order_ps as $item){
                 $order_total_price += $item->total_price;
                 $device_type = Helper::device($item->user_agent);
@@ -116,9 +117,10 @@ class OrderRepeat extends Card
 
             ksort($data);
 
-            $average_price = round($order_total_price/$order_count);
-            $pc_average_price = round($order_pc_total_price/$pc_order_count);
-            $m_average_price = round($order_m_total_price/$m_order_count);
+
+            $average_price = $order_count>0?round($order_total_price/$order_count):0;
+            $pc_average_price = $pc_order_count>0?round($order_pc_total_price/$pc_order_count):0;
+            $m_average_price = $m_order_count>0?round($order_m_total_price/$m_order_count):0;
 
             Cache::set($cache_key,[
                 'data'=>$data,
