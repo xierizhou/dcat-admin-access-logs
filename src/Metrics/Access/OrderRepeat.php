@@ -85,13 +85,13 @@ class OrderRepeat extends Card
             $m_order_count = 0;
 
             foreach ($order_ps as $item){
-                $order_total_price += $item->total_price;
+                $order_total_price += $item->$order_price;
                 $device_type = Helper::device($item->user_agent);
                 if(in_array($device_type,['iphone','android','ipad'])){
-                    $order_m_total_price += $item->total_price;
+                    $order_m_total_price += $item->$order_price;
                     $m_order_count++;
                 }else{
-                    $order_pc_total_price += $item->total_price;
+                    $order_pc_total_price += $item->$order_price;
                     $pc_order_count++;
                 }
             }
