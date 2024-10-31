@@ -84,7 +84,9 @@ class OrderConversion extends Card
 
 
             $order_model = AccessLogServiceProvider::setting('order_model');
-            $orders = app($order_model)->select(['ip','user_agent'])->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where('status','>',0)->get();
+            $order_status = AccessLogServiceProvider::setting('order_status','status');
+
+            $orders = app($order_model)->select(['ip','user_agent'])->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where($order_status,'>',0)->get();
             $pc_order_count = 0;
             $m_order_count = 0;
             foreach ($orders as $order){

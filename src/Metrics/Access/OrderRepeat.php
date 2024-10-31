@@ -72,10 +72,11 @@ class OrderRepeat extends Card
 
         if(!Cache::has($cache_key)){
             $order_model = AccessLogServiceProvider::setting('order_model');
-            $orders = app($order_model)->select('phone', \DB::raw('COUNT(*) as count'))->groupBy('phone')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where('status','>',0)->get();
-            $phone2 = app($order_model)->where('created_at','<',$dateRange['start'])->where('status','>',0)->pluck('phone');
+            $order_status = AccessLogServiceProvider::setting('order_status','status');
+            $orders = app($order_model)->select('phone', \DB::raw('COUNT(*) as count'))->groupBy('phone')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where($order_status,'>',0)->get();
+            $phone2 = app($order_model)->where('created_at','<',$dateRange['start'])->where($order_status,'>',0)->pluck('phone');
 
-            $order_ps = app($order_model)->select('total_price','user_agent')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where('status','>',0)->get();
+            $order_ps = app($order_model)->select('total_price','user_agent')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where($order_status,'>',0)->get();
             $order_total_price = 0;
             $order_pc_total_price = 0;
             $order_m_total_price = 0;
