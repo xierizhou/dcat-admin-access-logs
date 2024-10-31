@@ -37,7 +37,7 @@ return [
     ],
     '2.0.0' => [
         '增加更多的统计',
-        'change_created_at_key_into_jou_access_logs.php',
+        //'change_created_at_key_into_jou_access_logs.php',
     ],
     '2.0.1' => [
         '增加地区字段',
