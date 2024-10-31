@@ -14,7 +14,7 @@ class CreateAccessLogsTable extends Migration
     public function up()
     {
         Schema::create('jou_access_logs', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('id', true);
             $table->string('url')->comment('访问的url');
             $table->string('method',20)->comment('请求方式');
             $table->string('host')->comment('域名');
