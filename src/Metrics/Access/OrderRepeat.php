@@ -75,6 +75,7 @@ class OrderRepeat extends Card
             $order_status = AccessLogServiceProvider::setting('order_status','status');
             $order_price = AccessLogServiceProvider::setting('order_price','total_price');
             $orders = app($order_model)->select('phone', \DB::raw('COUNT(*) as count'))->groupBy('phone')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where($order_status,'>',0)->get();
+
             $phone2 = app($order_model)->where('created_at','<',$dateRange['start'])->where($order_status,'>',0)->pluck('phone');
 
             $order_ps = app($order_model)->select($order_price,'user_agent')->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])->where($order_status,'>',0)->get();
@@ -83,6 +84,7 @@ class OrderRepeat extends Card
             $order_m_total_price = 0;
             $pc_order_count = 0;
             $m_order_count = 0;
+            $people_count = $orders->count();
 
             foreach ($order_ps as $item){
                 $order_total_price += $item->$order_price;
@@ -127,6 +129,7 @@ class OrderRepeat extends Card
             Cache::set($cache_key,[
                 'data'=>$data,
                 'new_customer'=>$new_customer,
+                'people_count'=>$people_count,
                 'order_total_price'=>round($order_total_price),
                 'order_m_total_price'=>round($order_m_total_price),
                 'order_pc_total_price'=>round($order_pc_total_price),
@@ -148,6 +151,8 @@ class OrderRepeat extends Card
             $average_price = isset($cache_data['average_price'])?round($cache_data['average_price']):0;
             $pc_average_price = isset($cache_data['pc_average_price'])?round($cache_data['pc_average_price']):0;
             $m_average_price = isset($cache_data['m_average_price'])?round($cache_data['m_average_price']):0;
+
+            $people_count = isset($cache_data['people_count'])?round($cache_data['people_count']):0;
         }
 
         $this->withContent(
@@ -158,7 +163,8 @@ class OrderRepeat extends Card
             $order_m_total_price,
             $average_price,
             $pc_average_price,
-            $m_average_price
+            $m_average_price,
+            $people_count,
         );
 
     }
@@ -175,9 +181,10 @@ class OrderRepeat extends Card
      * @param $average_price
      * @param $pc_average_price
      * @param $m_average_price
+     * @param $people_count
      * @return OrderRepeat
      */
-    public function withContent($data,$new_customer,$order_total_price,$order_pc_total_price,$order_m_total_price,$average_price,$pc_average_price,$m_average_price)
+    public function withContent($data,$new_customer,$order_total_price,$order_pc_total_price,$order_m_total_price,$average_price,$pc_average_price,$m_average_price,$people_count)
     {
 
         $count = array_sum($data);
@@ -200,7 +207,7 @@ class OrderRepeat extends Card
         }
 
 
-
+        $html .= '<p>不重复人数：<b>'.$people_count.'</b></p>';
         foreach ($data as $k=>$v){
             $html .= '<p>'.$k.'單：<b>'.$v.'</b></p>';
         }
