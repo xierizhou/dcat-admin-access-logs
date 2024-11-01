@@ -37,6 +37,6 @@ class CreateAccessLogsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('jou_access_logs');
+
     }
 }

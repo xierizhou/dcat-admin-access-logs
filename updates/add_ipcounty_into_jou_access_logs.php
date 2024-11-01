@@ -27,8 +27,6 @@ class AddDescribeIntoProducts extends Migration
      */
     public function down()
     {
-        Schema::table('jou_access_logs', function (Blueprint $table) {
-            $table->dropColumn('ipcountry');
-        });
+
     }
 }
